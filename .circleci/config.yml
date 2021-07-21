@@ -160,6 +160,9 @@ jobs:
       - image: circleci/node:<< parameters.node_version >>
     steps:
       - checkout
+      - run:
+          name: thx npm
+          command: mkdir dist && mkdir dist/lib && touch dist/lib/index.js && mkdir dist/cli && touch dist/cli/index.js && mkdir packages/snyk-fix/dist && touch packages/snyk-fix/dist/index.js && mkdir packages/snyk-protect/dist && touch packages/snyk-protect/dist/index.js
       - setup_remote_docker:
           version: 19.03.13
           docker_layer_caching: true
@@ -167,26 +170,14 @@ jobs:
       - run: sudo npm install -g npm@7
       - show_node_version
       - update_local_npmrc_linux
-      - install_deps
-      - build_ts
-      - generate_help
       - run:
-          name: Run auth
-          command: npm run snyk-auth
+          name: Install dependencies
+          command: npm ci
+      - generate_help
+      - build_ts
       - run:
           name: Run tests
           command: npm run test:common
-      - run:
-          name: Clear Snyk config
-          command: rm ~/.config/configstore/snyk.json
-      - run:
-          name: Clear node_modules
-          command: rm -rf node_modules/
-      - run:
-          name: Install only production dependencies
-          command: npx npm@6 install # kludge because npm@7 will invoke the lifecycle scripts (thus running prepare -> tsc) even if we use --ignore-scripts
-          environment:
-            NODE_ENV: production
       - run:
           name: npm install for fixture project
           working_directory: ~/snyk/test/fixtures/basic-npm
