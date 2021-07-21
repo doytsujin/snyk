@@ -71,14 +71,10 @@ export async function test(
       if (e instanceof TestLimitReachedError) {
         throw e;
       }
-
       // If something has gone wrong, err on the side of allowing the user to
-      // run their tests.
-      // TODO propagate error
-      console.log(e);
+      // run their tests by squashing the error.
     }
 
-    // TODO can't collect analytics if we throw an exception above
     addIacAnalytics(formattedResults);
 
     // TODO: add support for proper typing of old TestResult interface.
